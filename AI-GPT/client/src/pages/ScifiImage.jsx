@@ -12,29 +12,30 @@ import {
   Alert,
   Collapse,
   Card,
+  Container,
 } from "@mui/material";
 
 const ScifiImage = () => {
   const theme = useTheme();
   const navigate = useNavigate();
-  //media
-  const isNotMobile = useMediaQuery("(min-width: 1000px)");
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
   // states
   const [text, settext] = useState("");
   const [image, setImage] = useState("");
   const [error, setError] = useState("");
   const loggedIn = JSON.parse(localStorage.getItem("authToken"));
 
-  //register ctrl
+  //scifi image ctrl
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post("https://chatgpt-clone-server-p2dj.onrender.com/api/v1/openai/scifi-image", { text });
+      const { data } = await axios.post("https://chatgpt-clone-server-p2dj.onrender.com/api/v1/openai/scifiImage", { text });
       console.log(data);
       setImage(data);
     } catch (err) {
       console.log(error);
-      if (err.response.data.error) {
+      if (err.response?.data?.error) {
         setError(err.response.data.error);
       } else if (err.message) {
         setError(err.message);
@@ -44,44 +45,83 @@ const ScifiImage = () => {
       }, 5000);
     }
   };
+
   return (
     <>
-      {
-        !loggedIn ? (
-          <Box p={10} sx={{ display: 'flex', justifyContent: 'center', alignContent: 'flex-start' }}>
-            <Typography variant="h3">
-              Please
-              <Link to={'/login'} >Log In</Link>
+      {!loggedIn ? (
+        <Container maxWidth="md" sx={{ py: { xs: 4, md: 8 } }}>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography 
+              variant="h3" 
+              sx={{ 
+                mb: 2,
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              Please{" "}
+              <Link 
+                to={'/login'} 
+                style={{ 
+                  color: "#3B82F6", 
+                  textDecoration: "none",
+                  fontWeight: 600,
+                }}
+              >
+                Log In
+              </Link>{" "}
               to Continue
             </Typography>
           </Box>
-        ) : (
+        </Container>
+      ) : (
+        <Container maxWidth="md" sx={{ py: { xs: 2, md: 4 } }}>
           <Box
-            width={isNotMobile ? "40%" : "80%"}
-            p={"2rem"}
-            m={"2rem auto"}
-            borderRadius={5}
-            sx={{ boxShadow: 5 }}
-            backgroundColor={theme.palette.background.alt}
+            sx={{
+              width: "100%",
+              p: { xs: 2, md: 3 },
+              m: "2rem auto",
+              borderRadius: 3,
+              background: "rgba(255, 255, 255, 0.05)",
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+            }}
           >
             <Collapse in={error !== ''}>
-              <Alert severity="error" sx={{ mb: 2 }}>
+              <Alert severity="error" sx={{ mb: 3 }}>
                 {error}
               </Alert>
             </Collapse>
+            
             <form onSubmit={handleSubmit}>
-              <Typography variant="h3">Scifi Image</Typography>
+              <Typography 
+                variant="h3" 
+                sx={{ 
+                  mb: 3, 
+                  textAlign: "center",
+                  background: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                Sci-Fi Image Generator
+              </Typography>
+
               <TextField
-                placeholder="Add your text"
+                label="Describe the sci-fi image you want"
+                placeholder="Describe the futuristic scene, characters, or technology..."
                 type="text"
-                multiline={true}
+                multiline
+                rows={3}
                 required
-                margin="normal"
                 fullWidth
                 value={text}
-                onChange={(e) => {
-                  settext(e.target.value);
-                }}
+                onChange={(e) => settext(e.target.value)}
+                sx={{ mb: 3 }}
               />
 
               <Button
@@ -89,12 +129,35 @@ const ScifiImage = () => {
                 fullWidth
                 variant="contained"
                 size="large"
-                sx={{ color: "white", mt: 2 }}
+                sx={{ 
+                  color: "white", 
+                  mb: 3,
+                  py: 1.5,
+                  fontSize: "1.1rem",
+                  fontWeight: 600,
+                }}
               >
-                Submit
+                Generate Sci-Fi Image
               </Button>
-              <Typography mt={2}>
-                Not this tool ? <Link to="/">GO BACK</Link>
+              
+              <Typography 
+                sx={{ 
+                  textAlign: "center",
+                  color: "rgba(255, 255, 255, 0.8)",
+                  fontSize: { xs: "0.875rem", md: "1rem" },
+                }}
+              >
+                Not this tool?{" "}
+                <Link 
+                  to="/" 
+                  style={{ 
+                    color: "#3B82F6", 
+                    textDecoration: "none",
+                    fontWeight: 600,
+                  }}
+                >
+                  GO BACK
+                </Link>
               </Typography>
             </form>
 
@@ -102,47 +165,85 @@ const ScifiImage = () => {
               <Card
                 sx={{
                   mt: 4,
-                  border: 1,
-                  boxShadow: 0,
-                  height: "500px",
-                  borderRadius: 5,
-                  borderColor: "natural.medium",
-                  bgcolor: "background.default",
+                  p: 3,
+                  borderRadius: 3,
+                  background: "rgba(255, 255, 255, 0.05)",
+                  backdropFilter: "blur(10px)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  minHeight: "300px",
                 }}
               >
-                <Box sx={{ display: "flex", justifyContent: "center", my: 5 }}>
-                  <img src={image} alt="scifiimage" />
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    mb: 2, 
+                    color: "#a8edea",
+                    fontWeight: 600,
+                  }}
+                >
+                  Generated Sci-Fi Image:
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    minHeight: "250px",
+                  }}
+                >
+                  <img
+                    src={image}
+                    alt="Generated Sci-Fi Image"
+                    style={{
+                      maxWidth: "100%",
+                      maxHeight: "400px",
+                      borderRadius: "12px",
+                      boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                    }}
+                  />
                 </Box>
               </Card>
             ) : (
               <Card
                 sx={{
                   mt: 4,
-                  border: 1,
-                  boxShadow: 0,
-                  height: "500px",
-                  borderRadius: 5,
-                  borderColor: "natural.medium",
-                  bgcolor: "background.default",
+                  p: 3,
+                  borderRadius: 3,
+                  background: "rgba(255, 255, 255, 0.05)",
+                  backdropFilter: "blur(10px)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  minHeight: "300px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
                 <Typography
-                  variant="h5"
-                  color="natural.main"
+                  variant="h6"
                   sx={{
                     textAlign: "center",
-                    verticalAlign: "middle",
-                    lineHeight: "450px",
+                    color: "rgba(255, 255, 255, 0.6)",
+                    fontSize: { xs: "1rem", md: "1.25rem" },
                   }}
                 >
-                  Scifi Image Will Appear Here
-                  (Please wait for few secs after submitting...)
+                  Generated sci-fi image will appear here
+                  <br />
+                  <Typography 
+                    variant="body2" 
+                    sx={{ 
+                      mt: 1,
+                      color: "rgba(255, 255, 255, 0.5)",
+                      fontSize: { xs: "0.75rem", md: "0.875rem" },
+                    }}
+                  >
+                    (Please wait a few seconds after submitting...)
+                  </Typography>
                 </Typography>
               </Card>
             )}
           </Box>
-        )
-      }
+        </Container>
+      )}
     </>
   );
 };
