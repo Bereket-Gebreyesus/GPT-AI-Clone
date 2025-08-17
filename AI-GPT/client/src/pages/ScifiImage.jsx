@@ -13,6 +13,7 @@ import {
   Collapse,
   Card,
   Container,
+  CircularProgress,
 } from "@mui/material";
 
 const ScifiImage = () => {
@@ -24,25 +25,37 @@ const ScifiImage = () => {
   const [text, settext] = useState("");
   const [image, setImage] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const loggedIn = JSON.parse(localStorage.getItem("authToken"));
 
   //scifi image ctrl
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Prevent multiple submissions
+    if (isLoading) return;
+    
+    setIsLoading(true);
+    setError("");
+    
     try {
       const { data } = await axios.post("https://chatgpt-clone-server-p2dj.onrender.com/api/v1/openai/scifiImage", { text });
       console.log(data);
       setImage(data);
     } catch (err) {
-      console.log(error);
+      console.log(err);
       if (err.response?.data?.error) {
         setError(err.response.data.error);
       } else if (err.message) {
         setError(err.message);
+      } else {
+        setError("An unexpected error occurred. Please try again.");
       }
       setTimeout(() => {
         setError("");
       }, 5000);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -121,6 +134,7 @@ const ScifiImage = () => {
                 fullWidth
                 value={text}
                 onChange={(e) => settext(e.target.value)}
+                disabled={isLoading}
                 sx={{ mb: 3 }}
               />
 
@@ -129,15 +143,39 @@ const ScifiImage = () => {
                 fullWidth
                 variant="contained"
                 size="large"
+                disabled={isLoading}
                 sx={{ 
                   color: "white", 
                   mb: 3,
                   py: 1.5,
                   fontSize: "1.1rem",
                   fontWeight: 600,
+                  background: isLoading 
+                    ? "linear-gradient(135deg, #94A3B8 0%, #64748B 100%)" 
+                    : "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+                  "&:hover": {
+                    background: isLoading 
+                      ? "linear-gradient(135deg, #94A3B8 0%, #64748B 100%)" 
+                      : "linear-gradient(135deg, #fed6e3 0%, #fbb6c1 100%)",
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 8px 25px rgba(168, 237, 234, 0.3)",
+                  },
+                  "&:disabled": {
+                    background: "linear-gradient(135deg, #94A3B8 0%, #64748B 100%)",
+                    transform: "none",
+                    boxShadow: "none",
+                  },
+                  transition: "all 0.3s ease",
                 }}
               >
-                Generate Sci-Fi Image
+                {isLoading ? (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <CircularProgress size={20} sx={{ color: "white" }} />
+                    <span>Generating Image...</span>
+                  </Box>
+                ) : (
+                  "Generate Sci-Fi Image"
+                )}
               </Button>
               
               <Typography 

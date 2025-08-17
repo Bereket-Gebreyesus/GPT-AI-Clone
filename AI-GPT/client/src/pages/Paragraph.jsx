@@ -13,6 +13,7 @@ import {
   Collapse,
   Card,
   Container,
+  CircularProgress,
 } from "@mui/material";
 
 const Paragraph = () => {
@@ -24,25 +25,37 @@ const Paragraph = () => {
   const [text, settext] = useState("");
   const [paragraph, setParagraph] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const loggedIn = JSON.parse(localStorage.getItem("authToken"));
 
   //paragraph ctrl
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Prevent multiple submissions
+    if (isLoading) return;
+    
+    setIsLoading(true);
+    setError("");
+    
     try {
       const { data } = await axios.post("https://chatgpt-clone-server-p2dj.onrender.com/api/v1/openai/paragraph", { text });
       console.log(data);
       setParagraph(data);
     } catch (err) {
-      console.log(error);
+      console.log(err);
       if (err.response?.data?.error) {
         setError(err.response.data.error);
       } else if (err.message) {
         setError(err.message);
+      } else {
+        setError("An unexpected error occurred. Please try again.");
       }
       setTimeout(() => {
         setError("");
       }, 5000);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -121,6 +134,7 @@ const Paragraph = () => {
                 fullWidth
                 value={text}
                 onChange={(e) => settext(e.target.value)}
+                disabled={isLoading}
                 sx={{ mb: 3 }}
               />
 
@@ -129,15 +143,39 @@ const Paragraph = () => {
                 fullWidth
                 variant="contained"
                 size="large"
+                disabled={isLoading}
                 sx={{ 
                   color: "white", 
                   mb: 3,
                   py: 1.5,
                   fontSize: "1.1rem",
                   fontWeight: 600,
+                  background: isLoading 
+                    ? "linear-gradient(135deg, #94A3B8 0%, #64748B 100%)" 
+                    : "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+                  "&:hover": {
+                    background: isLoading 
+                      ? "linear-gradient(135deg, #94A3B8 0%, #64748B 100%)" 
+                      : "linear-gradient(135deg, #f5576c 0%, #e91e63 100%)",
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 8px 25px rgba(240, 147, 251, 0.3)",
+                  },
+                  "&:disabled": {
+                    background: "linear-gradient(135deg, #94A3B8 0%, #64748B 100%)",
+                    transform: "none",
+                    boxShadow: "none",
+                  },
+                  transition: "all 0.3s ease",
                 }}
               >
-                Generate Paragraph
+                {isLoading ? (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <CircularProgress size={20} sx={{ color: "white" }} />
+                    <span>Generating Paragraph...</span>
+                  </Box>
+                ) : (
+                  "Generate Paragraph"
+                )}
               </Button>
               
               <Typography 

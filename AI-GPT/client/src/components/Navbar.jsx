@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { 
   Box, 
   Typography, 
@@ -25,6 +25,7 @@ const Navbar = () => {
   const location = useLocation();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const loggedIn = JSON.parse(localStorage.getItem("authToken"));
+  const [mobileValue, setMobileValue] = useState(location.pathname);
 
   //handle logout
   const handleLogout = async () => {
@@ -39,13 +40,29 @@ const Navbar = () => {
   };
 
   const navItems = loggedIn ? [
-    { text: "Home", route: "/", icon: <HomeIcon /> },
-    { text: "Logout", action: handleLogout, icon: <LogoutIcon />, isPrimary: true }
+    { text: "Home", route: "/", icon: <HomeIcon />, value: "/" },
+    { text: "Logout", action: handleLogout, icon: <LogoutIcon />, isPrimary: true, value: "logout" }
   ] : [
-    { text: "Home", route: "/", icon: <HomeIcon /> },
-    { text: "Register", route: "/register", icon: <PersonAddIcon /> },
-    { text: "Login", route: "/login", icon: <LoginIcon />, isPrimary: true }
+    { text: "Home", route: "/", icon: <HomeIcon />, value: "/" },
+    { text: "Register", route: "/register", icon: <PersonAddIcon />, value: "/register" },
+    { text: "Login", route: "/login", icon: <LoginIcon />, isPrimary: true, value: "/login" }
   ];
+
+  // Handle mobile navigation change
+  const handleMobileNavChange = (event, newValue) => {
+    setMobileValue(newValue);
+    
+    if (newValue === 'logout') {
+      handleLogout();
+    } else {
+      navigate(newValue);
+    }
+  };
+
+  // Update mobile value when location changes
+  React.useEffect(() => {
+    setMobileValue(location.pathname);
+  }, [location.pathname]);
 
   return (
     <>
@@ -134,14 +151,8 @@ const Navbar = () => {
       {/* Mobile Bottom Navigation */}
       {isMobile && (
         <BottomNavigation
-          value={location.pathname}
-          onChange={(event, newValue) => {
-            if (newValue === 'logout') {
-              handleLogout();
-            } else {
-              navigate(newValue);
-            }
-          }}
+          value={mobileValue}
+          onChange={handleMobileNavChange}
           sx={{
             position: 'fixed',
             bottom: 0,
@@ -168,7 +179,7 @@ const Navbar = () => {
             <BottomNavigationAction
               key={item.text}
               label={item.text}
-              value={item.route}
+              value={item.value}
               icon={item.icon}
               sx={{
                 '&.Mui-selected': {

@@ -12,6 +12,7 @@ import {
   Alert,
   Collapse,
   Container,
+  CircularProgress,
 } from "@mui/material";
 
 const Register = () => {
@@ -24,10 +25,18 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   //register ctrl
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Prevent multiple submissions
+    if (isLoading) return;
+    
+    setIsLoading(true);
+    setError("");
+    
     try {
       await axios.post("https://chatgpt-clone-server-p2dj.onrender.com/api/v1/auth/register", {
         username,
@@ -37,15 +46,19 @@ const Register = () => {
       toast.success("User Registered Successfully");
       navigate("/login");
     } catch (err) {
-      console.log(error);
+      console.log(err);
       if (err.response?.data?.error) {
         setError(err.response.data.error);
       } else if (err.message) {
         setError(err.message);
+      } else {
+        setError("An unexpected error occurred. Please try again.");
       }
       setTimeout(() => {
         setError("");
       }, 5000);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -90,6 +103,7 @@ const Register = () => {
             fullWidth
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            disabled={isLoading}
             sx={{ mb: 2 }}
           />
           
@@ -100,6 +114,7 @@ const Register = () => {
             fullWidth
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            disabled={isLoading}
             sx={{ mb: 2 }}
           />
           
@@ -110,6 +125,7 @@ const Register = () => {
             fullWidth
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            disabled={isLoading}
             sx={{ mb: 3 }}
           />
           
@@ -118,15 +134,39 @@ const Register = () => {
             fullWidth
             variant="contained"
             size="large"
+            disabled={isLoading}
             sx={{ 
               color: "white", 
               mb: 2,
               py: 1.5,
               fontSize: "1.1rem",
               fontWeight: 600,
+              background: isLoading 
+                ? "linear-gradient(135deg, #94A3B8 0%, #64748B 100%)" 
+                : "linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)",
+              "&:hover": {
+                background: isLoading 
+                  ? "linear-gradient(135deg, #94A3B8 0%, #64748B 100%)" 
+                  : "linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%)",
+                transform: "translateY(-2px)",
+                boxShadow: "0 8px 25px rgba(59, 130, 246, 0.3)",
+              },
+              "&:disabled": {
+                background: "linear-gradient(135deg, #94A3B8 0%, #64748B 100%)",
+                transform: "none",
+                boxShadow: "none",
+              },
+              transition: "all 0.3s ease",
             }}
           >
-            Register
+            {isLoading ? (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <CircularProgress size={20} sx={{ color: "white" }} />
+                <span>Creating Account...</span>
+              </Box>
+            ) : (
+              "Register"
+            )}
           </Button>
           
           <Typography 
@@ -143,6 +183,15 @@ const Register = () => {
                 color: "#3B82F6", 
                 textDecoration: "none",
                 fontWeight: 600,
+                transition: "all 0.3s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.color = "#60A5FA";
+                e.target.style.textDecoration = "underline";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.color = "#3B82F6";
+                e.target.style.textDecoration = "none";
               }}
             >
               Login
