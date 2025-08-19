@@ -24,13 +24,13 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const loggedIn = JSON.parse(localStorage.getItem("authToken"));
+  const loggedIn = localStorage.getItem("authToken");
   const [mobileValue, setMobileValue] = useState(location.pathname);
 
   //handle logout
   const handleLogout = async () => {
     try {
-      await axios.post("https://chatgpt-clone-server-p2dj.onrender.com/api/v1/auth/logout");
+      await axios.post("http://localhost:5000/api/v1/auth/logout");
       localStorage.removeItem("authToken");
       toast.success("Logged out successfully ");
       navigate("/login");
