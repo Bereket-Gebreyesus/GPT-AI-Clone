@@ -72,6 +72,8 @@ userSchema.methods.getSignedToken = function (res) {
     maxAge: 86400 * 7000,
     httpOnly: true,
   })
+  
+  return accessToken;
 }
 
 

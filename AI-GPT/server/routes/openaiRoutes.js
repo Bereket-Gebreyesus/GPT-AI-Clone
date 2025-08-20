@@ -1,4 +1,5 @@
 const express = require("express");
+const { protect } = require("../middlewares/authMiddleware");
 const {
   summaryController,
   paragraphController,
@@ -8,6 +9,9 @@ const {
 } = require("../controllers/openaiController");
 
 const router = express.Router();
+
+// Protect all OpenAI routes
+router.use(protect);
 
 //route
 router.post("/summary", summaryController);

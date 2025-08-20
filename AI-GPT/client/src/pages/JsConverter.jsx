@@ -26,7 +26,7 @@ const JsConverter = () => {
   const [jsCode, setJsCode] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const loggedIn = JSON.parse(localStorage.getItem("authToken"));
+  const loggedIn = localStorage.getItem("authToken");
 
   //js converter ctrl
   const handleSubmit = async (e) => {
@@ -39,7 +39,10 @@ const JsConverter = () => {
     setError("");
     
     try {
-      const { data } = await axios.post("https://chatgpt-clone-server-p2dj.onrender.com/api/v1/openai/jsconverter", { text });
+      const token = localStorage.getItem("authToken");
+      const { data } = await axios.post("http://localhost:5000/api/v1/openai/jsconverter", { text }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       console.log(data);
       setJsCode(data);
     } catch (err) {

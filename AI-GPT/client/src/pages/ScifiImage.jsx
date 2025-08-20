@@ -26,7 +26,7 @@ const ScifiImage = () => {
   const [image, setImage] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const loggedIn = JSON.parse(localStorage.getItem("authToken"));
+  const loggedIn = localStorage.getItem("authToken");
 
   //scifi image ctrl
   const handleSubmit = async (e) => {
@@ -39,7 +39,10 @@ const ScifiImage = () => {
     setError("");
     
     try {
-      const { data } = await axios.post("https://chatgpt-clone-server-p2dj.onrender.com/api/v1/openai/scifiImage", { text });
+      const token = localStorage.getItem("authToken");
+      const { data } = await axios.post("http://localhost:5000/api/v1/openai/scifiImage", { text }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       console.log(data);
       setImage(data);
     } catch (err) {

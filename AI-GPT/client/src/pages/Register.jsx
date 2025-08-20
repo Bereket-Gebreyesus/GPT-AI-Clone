@@ -38,7 +38,7 @@ const Register = () => {
     setError("");
     
     try {
-      await axios.post("https://chatgpt-clone-server-p2dj.onrender.com/api/v1/auth/register", {
+      await axios.post("http://localhost:5000/api/v1/auth/register", {
         username,
         email,
         password
